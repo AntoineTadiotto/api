@@ -37,4 +37,27 @@ class ArticleController extends FOSRestController
     return $this->handleView($this->view($data, 200));
   }
 
+  /**
+   * Lists top 10 Articles.
+   * @Rest\Get("/toparticles")
+   *
+   * @return Response
+   */
+  public function getTopArticleAction(ObjectManager $manager)
+  {
+    // $repository = $this->getDoctrine()->getRepository(Article::class);
+    // $articles = $repository->findall();
+
+    $conn = $manager->getConnection();
+        $sql = '
+        SELECT article_id, SUM(quantity) as quantityTotal FROM ligne_article GROUP BY article_id ORDER BY quantityTotal DESC LIMIT 3
+        ';
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $data = $stmt->fetchAll();
+
+
+    return $this->handleView($this->view($data, 200));
+  }
+
 }
